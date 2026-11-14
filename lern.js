@@ -309,7 +309,9 @@ const Lern = (() => {
     g.querySelector(".gs").onclick = () => say(tip());
     g.querySelector(".gx").onclick = () => { g.remove(); try { localStorage.setItem(GK, "1"); } catch(e){} toast("Satoshi ist weg. Zurückholen: unten auf der Startseite."); };
     g.querySelector(".gb span").onclick = () => g.classList.remove("talk");   // Antippen schließt die Blase
-    setTimeout(() => { if (!document.querySelector(".intro")) say(tip(), 5500); }, 900);
+    // Jeder Tipp kommt nur beim ersten Besuch der Seite von selbst, danach nur auf Antippen
+    let seen = []; try { seen = JSON.parse(localStorage.getItem("satsland-tipseen")) || []; } catch(e){}
+    if (!seen.includes(here)) setTimeout(() => { if (document.querySelector(".intro")) return; say(tip(), 5500); try { localStorage.setItem("satsland-tipseen", JSON.stringify(seen.concat(here))); } catch(e){} }, 900);
   }
   const PRAISE = ["Stark! 💪", "Genau so!", "Du hast's drauf!", "Richtig! Weiter so."], OOPS = ["Fast! Lies kurz die Erklärung.", "Kein Problem, so lernt man.", "Knapp daneben. Jetzt weißt du's!"];
   const pickOne = a => a[Math.floor(Math.random()*a.length)];
@@ -712,7 +714,8 @@ const Lern = (() => {
   function reveal(){
     if (calm || !("IntersectionObserver" in window)) return;
     const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); } }), {rootMargin: "0px 0px -6% 0px"});
-    document.querySelectorAll(".wrap > .card, .learn > div, a.w").forEach((el, i) => { el.classList.add("rv"); el.style.setProperty("--d", (i % 4)*70 + "ms"); io.observe(el); });
+    const vh = innerHeight;   // was beim Start schon sichtbar ist, steht sofort da; nur Weiter-unten-Inhalte gleiten beim Scrollen herein
+    document.querySelectorAll(".wrap > .card, .learn > div, a.w").forEach((el, i) => { if (el.getBoundingClientRect().top < vh * .92) return; el.classList.add("rv"); el.style.setProperty("--d", (i % 4)*70 + "ms"); io.observe(el); });
     setTimeout(() => document.querySelectorAll(".rv").forEach(el => el.classList.add("in")), 5000);   // Sicherheitsnetz
   }
   const seg = location.pathname.split("/").filter(Boolean), last = seg[seg.length - 1], here = PATH.some(([id]) => id === last) || proOf(last) >= 0 ? last : "";
@@ -746,3 +749,10 @@ const Lern = (() => {
   init();
   return {sfx, review, repDue, shareCard, calm, calmToggle, PRO, proOf, TITLES, syncExport, syncImport, TITLES_LIST, titles, finalCard, GLOSSAR, nextStep, PATH, CHAPTERS, ART, art, BOSSES, boss, bossWon, bossCard, CARD, daily, streak, say, GK, chapterOf, LEVELS, level, count, load, done, visit, quiz, renderNext, nextAfter, sha256, confetti, toast};
 })();
+// Seitenstart: sobald alle Skripte gelaufen sind, Inhalt in einem Zug einblenden
+document.addEventListener("DOMContentLoaded", () => requestAnimationFrame(() => document.documentElement.classList.remove("boot")));
+// Sofortige Seitenwechsel: Seiten im Hintergrund vorladen, sobald man einen Link berührt (Chrome, Edge), das nächste Level gleich vorab
+document.addEventListener("DOMContentLoaded", () => { try { if (HTMLScriptElement.supports && HTMLScriptElement.supports("speculationrules")){ const nx = document.querySelector("#next a, .next a");
+  const sr = document.createElement("script"); sr.type = "speculationrules";
+  sr.textContent = JSON.stringify({prefetch: [{where: {and: [{href_matches: "/*"}, {not: {selector_matches: "[data-arena], [href^='#']"}}]}, eagerness: "moderate"}].concat(nx ? [{urls: [nx.href], eagerness: "eager"}] : [])});
+  document.head.appendChild(sr); } } catch(e){} });

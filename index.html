@@ -14,7 +14,7 @@
 <meta property="og:description" content="Bitcoin spielerisch verstehen, mit echten Live-Daten.">
 <meta property="og:image" content="https://satsland.github.io/og.png">
 <meta property="og:url" content="https://satsland.github.io/">
-<link rel="stylesheet" href="lern.css?v=51">
+<link rel="stylesheet" href="lern.css?v=52">
 <style>
 /* Übersicht der Lernwelten: gleiche Farben und Schriften wie das Spiel. */
 .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
@@ -82,8 +82,8 @@ a:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
 @media (prefers-reduced-motion:reduce){ .mapw .twk,.mapw .shoot,.mapw .fly2{animation:none} .mapw .shoot,.mapw .fly2{display:none} }
 .mapw .bob{animation:mbob 1.4s ease-in-out infinite} @keyframes mbob{50%{transform:translateY(-5px)}}
 .mapw .flag{transform-box:fill-box;transform-origin:0 50%;animation:mflag 1.8s ease-in-out infinite} @keyframes mflag{50%{transform:scaleX(.82) skewY(4deg)}}
-.mapw{margin-top:10px;max-height:72vh;overflow-y:auto;overscroll-behavior:contain;border-radius:18px;border:3px solid #0d1230;box-shadow:4px 4px 0 #0d1230;background:#0b0f2a;scroll-behavior:smooth}
-.mapw svg{display:block;width:100%;height:auto} .mapw a,.mapw [data-b]{cursor:pointer}
+.mapw{margin-top:10px;height:72vh;max-height:72vh;overflow-y:auto;overscroll-behavior:contain;border-radius:18px;border:3px solid #0d1230;box-shadow:4px 4px 0 #0d1230;background:#0b0f2a;scroll-behavior:smooth}
+.mapw svg{display:block;width:100%;height:auto} .mapw svg.min{animation:mapin .35s ease both} @keyframes mapin{from{opacity:0}} .mapw a,.mapw [data-b]{cursor:pointer}
 .mapw a:hover .nb,.mapw [data-b]:hover .nb{stroke:#ffc94d}
 .mapw .curr{animation:mpulse 1.6s ease-in-out infinite;transform-box:fill-box;transform-origin:center} @keyframes mpulse{50%{transform:scale(1.12)}}
 .mapw .spin{animation:mspin 8s linear infinite;transform-box:fill-box;transform-origin:center} @keyframes mspin{to{transform:rotate(360deg)}}
@@ -126,6 +126,7 @@ details.fold[open] > summary{margin-bottom:12px}
 .iwel .ign{width:100%;justify-content:center;font-size:17px} .ilook{display:block;width:100%;margin:8px 0 6px;background:none;border:0;color:var(--muted);font:700 14px var(--f-body);padding:10px;cursor:pointer;text-decoration:underline;text-underline-offset:3px} .iwel small{display:block;color:var(--muted);font-size:12px;opacity:.8}
 .calm .iev span,.calm .iev i{animation:none}
 </style>
+<style>html{background:#0b0f2a;color-scheme:dark}</style><script>document.documentElement.classList.add("boot")</script>
 </head>
 <body>
 <div class="wrap">
@@ -219,7 +220,7 @@ details.fold[open] > summary{margin-bottom:12px}
   <p class="foot">Unterhaltung und Lernen, keine Anlageberatung. Keine Cookies, kein Tracking. <a href="#" id="guideOn" style="color:inherit">Satoshi zurückholen</a> · <a href="#" id="introOn" style="color:inherit">Einführung ansehen</a> · <a href="#" id="calmOn" style="color:inherit">Weniger Bewegung</a><br><a href="ueber/" style="color:inherit">Über Satsland</a> · <a href="datenschutz/" style="color:inherit">Datenschutz</a> · <a href="#" id="rstOn" style="color:inherit">Fortschritt zurücksetzen</a></p>
   <div class="card" id="rstBox" hidden><h2 style="margin:0 0 4px">🗑️ Fortschritt zurücksetzen?</h2><p class="muted" style="margin:0 0 10px;font-size:14px">Alle geschafften Level, Sterne, Bosse, Titel, die Serie und die Wiederholungsfragen werden auf diesem Gerät gelöscht. Auch Einstellungen wie Ton werden zurückgesetzt, die Seite startet wie beim ersten Besuch. Tipp: Vorher unter „Fortschritt mitnehmen“ einen Code sichern.</p><div class="acts" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" type="button" id="rstYes" style="background:linear-gradient(180deg,#ff7a8c,#e0405a);color:#fff">Ja, alles löschen</button><button class="btn ghost" type="button" id="rstNo">Abbrechen</button></div></div>
 </div>
-<script src="lern.js?v=52"></script>
+<script src="lern.js?v=53"></script>
 <script>
 // Lernpfad: Fortschritt aus dem eigenen Browser, Häkchen an den Karten, Empfehlung als Nächstes
 (() => {
@@ -401,7 +402,7 @@ details.fold[open] > summary{margin-bottom:12px}
     g += `<g data-b="f" role="button" tabindex="0" aria-label="Endboss: Dein altes Ich"><circle cx="${sx}" cy="${sy}" r="90" fill="url(#mglow)"/><ellipse cx="${sx}" cy="${sy + 9}" rx="46" ry="42" fill="${fw ? "#b8860b" : "#5a4a14"}" stroke="#0a0d26" stroke-width="3"/><circle class="nb ${cur >= N && !fw ? "curr" : ""}" cx="${sx}" cy="${sy}" r="46" fill="${fw || finReady ? "#ffd36b" : "#8a7a3a"}" stroke="#0a0d26" stroke-width="3"/>${art(fw ? "mirror" : "hood", sx, sy, 66)}
       <path d="M${sx + 30} ${sy - 44}V${sy - 112}" stroke="#0a0d26" stroke-width="5"/><path class="flag" d="M${sx + 30} ${sy - 112}l46 13-46 15z" fill="#f7931a" stroke="#0a0d26" stroke-width="3.5"/><text x="${sx + 46}" y="${sy - 93}" font-size="14" font-weight="900" fill="#fff" font-family="Arial">₿</text>
       ${chip(sx - 105, sy + 70, fw ? "🏆 Gipfel erreicht!" : "👑 Endboss: ?", 1, "#ffd36b", "rgba(11,15,42,.92)", 14)}</g>`;
-    document.getElementById("map").innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Lernpfad als Berg">${g}</svg>`;
+    document.getElementById("map").innerHTML = `<svg${first ? ' class="min"' : ""} viewBox="0 0 ${W} ${H}" role="img" aria-label="Lernpfad als Berg">${g}</svg>`;
     const gp = document.getElementById("mgold"); if (gp && first){ gp.style.setProperty("--len", gp.getTotalLength()); gp.style.strokeDasharray = gp.getTotalLength(); }
     const ty = (cur >= N ? peakY : P[cur][1]) * (mapw.clientWidth / W);
     mapw.style.scrollBehavior = "auto"; mapw.scrollTop = Math.max(0, ty - mapw.clientHeight * .55); mapw.style.scrollBehavior = "";
@@ -425,7 +426,7 @@ details.fold[open] > summary{margin-bottom:12px}
   function setView(v, first){ view = v; try { localStorage.setItem("satsland-view", v); } catch(e){}
     sec.classList.toggle("asmap", v === "map"); mapw.hidden = v !== "map";
     document.querySelectorAll("#vsw [data-v]").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === v));
-    if (v === "map") requestAnimationFrame(() => drawMap(first)); }
+    if (v === "map") setTimeout(() => requestAnimationFrame(() => drawMap(first)), first ? 260 : 0); }
   document.getElementById("vsw").onclick = e => { const b = e.target.closest("[data-v]"); if (b) setView(b.dataset.v, true); };
   let rz; addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => { if (view === "map") drawMap(false); }, 250); });
   setView(view, true);
