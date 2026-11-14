@@ -61,7 +61,7 @@ const Lern = (() => {
       const right = Object.values(answered).filter(Boolean).length, s = load(), before = level(count(s)), first = !done(s, id);
       s[id] = Object.assign({}, s[id], {quiz: Math.max(right, (s[id] && s[id].quiz) || 0), total: QUIZ.length}); save(s);
       const after = level(count(s));
-      res.hidden = false; res.textContent = `${"⭐".repeat(right)}${"☆".repeat(QUIZ.length - right)}  ${right} von ${QUIZ.length} richtig. ✓ Dieses Level ist in deinem Lernpfad abgehakt.`;
+      res.hidden = false; res.textContent = `${"⭐".repeat(right)}${"☆".repeat(QUIZ.length - right)}  ${right} von ${QUIZ.length} richtig. ${done(load(), id) ? "✓ Dieses Level ist in deinem Lernpfad abgehakt." : "Ab 1 richtigen Antwort ist das Level abgehakt."}`;
       if (new Date().getHours() < 4){ const tt = tget(); tt.owl = 1; tset(tt); }
       badge(); renderNext(id, root); titles();
       setTimeout(() => lvDone(right, QUIZ.length, first, after.name !== before.name ? after : null, after), 700);
@@ -215,7 +215,6 @@ const Lern = (() => {
     ["Was macht eine Schnorr-Signatur besonders?", ["Mehrere Schlüssel lassen sich zu einem bündeln", "Sie ist unendlich groß", "Sie braucht keinen Schlüssel"], 0, "Kam 2021 mit Taproot."],
     ["Was steht im Block-Kopf, um alle Zahlungen zusammenzufassen?", ["Die Merkle-Root", "Alle Namen", "Der Seed"], 0, "Ein einziger Hash über alle Zahlungen."],
     ["Was bedeutet 2-von-3 Multisig?", ["2 von 3 Schlüsseln müssen unterschreiben", "2 Bitcoin für 3 Personen", "3 Adressen, 2 Seeds"], 0, "Ideal für Familie und Erbschaft."],
-    ["Wie lange musst du Bitcoin in Deutschland halten, damit der Verkauf steuerfrei ist?", ["Länger als 1 Jahr", "10 Jahre", "Immer steuerpflichtig"], 0, "Gilt für privat gekaufte Bitcoin. Keine Steuerberatung."],
     ["Welches alte Problem löst Bitcoin mit Proof of Work?", ["Das Problem der byzantinischen Generäle", "Das Rätsel der Sphinx", "Das Ziegenproblem"], 0, "Wie sich Fremde einigen, wenn manche lügen."],
     ["Was passiert mit einem verwaisten Block?", ["Seine Zahlungen landen in einem späteren Block", "Das Geld ist weg", "Er wird gelöscht und alle Zahlungen verfallen"], 0, "Verwaiste Blöcke sind normal und harmlos."],
     ["Wie lange dauert eine Difficulty-Periode ungefähr?", ["2 Wochen", "2 Minuten", "2 Jahre"], 0, "2.016 Blöcke à 10 Minuten."]
@@ -688,17 +687,17 @@ const Lern = (() => {
   // ---------- Level geschafft: Sterne und großer Weiter-Knopf ----------
   function lvDone(right, total, first, rankUp, L){
     const st = Math.round(right/total*3), nx = document.querySelector("#next a"), nb = document.querySelector("#next b");
-    const msg = st === 3 ? "Perfekt, alles richtig!" : st === 2 ? "Stark! Lies die eine Erklärung nochmal, dann sitzt alles." : "Geschafft! Wiederhole das Quiz für mehr Sterne.";
+    const fail = !right, msg = fail ? "Lies die Erklärungen unter den Fragen und versuch es gleich nochmal. Ab 1 richtigen Antwort ist das Level abgehakt." : st === 3 ? "Perfekt, alles richtig!" : st === 2 ? "Stark! Lies die eine Erklärung nochmal, dann sitzt alles." : "Geschafft! Wiederhole das Quiz für mehr Sterne.";
     const o = document.createElement("div"); o.className = "lvdone"; o.setAttribute("role", "dialog"); o.setAttribute("aria-label", "Level geschafft");
-    o.innerHTML = `<div class="ldb"><small>${first ? "Level geschafft!" : "Quiz wiederholt"}</small><div class="stars">${[0, 1, 2].map(i => `<span class="${i < st ? "on" : ""}" style="animation-delay:${.25 + i*.28}s">★</span>`).join("")}</div>
+    o.innerHTML = `<div class="ldb"><small>${fail ? "Noch nicht geschafft" : first ? "Level geschafft!" : "Quiz wiederholt"}</small><div class="stars">${[0, 1, 2].map(i => `<span class="${i < st ? "on" : ""}" style="animation-delay:${.25 + i*.28}s">★</span>`).join("")}</div>
       <b class="sc">${right} von ${total} richtig</b><p>${msg}</p>${rankUp ? `<p class="ru">${rankUp.ico} Aufgestiegen! Du bist jetzt <b>${rankUp.name}</b>.</p>` : `<p class="ru2">${L.n} von ${PATH.length} Level geschafft</p>`}
-      <div class="acts">${nx ? `<a class="btn" href="${nx.getAttribute("href")}">Weiter: ${nb ? nb.textContent : "nächstes Level"} →</a>` : ""}<button class="btn ghost" type="button">Hier bleiben</button></div></div>`;
+      <div class="acts">${st < 3 ? `<button class="btn${fail ? "" : " ghost"}" type="button" data-again>🔄 Quiz nochmal</button>` : ""}${nx && !fail ? `<a class="btn" href="${nx.getAttribute("href")}">Weiter: ${nb ? nb.textContent : "nächstes Level"} →</a>` : ""}<button class="btn ghost" type="button" data-stay>Hier bleiben</button></div></div>`;
     document.body.appendChild(o);
-    const close = () => o.remove();
-    o.querySelector("button").onclick = close; o.onclick = e => { if (e.target === o) close(); };
-    sfx("lvl"); for (let i = 0; i < st; i++) setTimeout(() => sfx("star"), 300 + i*280);
+    const close = () => o.remove(), again = o.querySelector("[data-again]");
+    o.querySelector("[data-stay]").onclick = close; if (again) again.onclick = () => { location.hash = "quiz"; location.reload(); }; o.onclick = e => { if (e.target === o) close(); };
+    sfx(fail ? "no" : "lvl"); for (let i = 0; i < st; i++) setTimeout(() => sfx("star"), 300 + i*280);
     if (st === 3) setTimeout(confetti, 900);
-    (nx ? o.querySelector("a") : o.querySelector("button")).focus();
+    (o.querySelector("a.btn") || again || o.querySelector("button")).focus();
   }
 
   // Level-Anzeige im Kopf jeder Seite

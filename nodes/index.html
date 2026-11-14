@@ -141,7 +141,7 @@
   <p class="foot">Lernen und Unterhaltung, keine Anlageberatung.</p>
 </div>
 
-<script src="../lern.js?v=51"></script>
+<script src="../lern.js?v=52"></script>
 <script>
 /* =====================================================================
    NODE-WACHE – Lernwelt von Satsland
@@ -160,7 +160,7 @@ async function tip(base){
 async function compare(){
   const [a, b] = await Promise.all([tip("https://mempool.space/api/").catch(() => null), tip("https://blockstream.info/api/").catch(() => null)]);
   const put = (r, H, X) => { if (r){ $(H).textContent = "Block " + r.h.toLocaleString("de-DE"); $(X).textContent = "Hash …" + r.x.slice(-12); } };
-  put(a, "aH", "aX"); put(b, "bH", "bX");
+  put(a, "aH", "aX"); put(b, "bH", "bX"); if (!a){ $("aH").textContent = "nicht erreichbar"; $("aX").textContent = ""; } if (!b){ $("bH").textContent = "nicht erreichbar"; $("bX").textContent = ""; }
   const ok = a || b; $("mode").className = "mode " + (ok ? "live" : "demo"); $("mode").textContent = ok ? "Live" : "Beispielwerte";
   const vd = $("vd");
   if (a && b && a.x === b.x){ vd.className = "verdict ok"; vd.textContent = "✓ Beide sehen exakt denselben Block, ohne sich abzusprechen."; }
